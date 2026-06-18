@@ -1,0 +1,17 @@
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\bin\Debug\net8.0\Shopping_Core.deps.json
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\bin\Debug\net8.0\Shopping_Core.runtimeconfig.json
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\bin\Debug\net8.0\Shopping_Core.dll
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\bin\Debug\net8.0\Shopping_Core.pdb
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\bin\Debug\net8.0\Shopping_Data_Layer.dll
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\bin\Debug\net8.0\Shopping_Data_Layer.pdb
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\obj\Debug\net8.0\Shopping_Core.csproj.AssemblyReference.cache
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\obj\Debug\net8.0\Shopping_Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\obj\Debug\net8.0\Shopping_Core.AssemblyInfoInputs.cache
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\obj\Debug\net8.0\Shopping_Core.AssemblyInfo.cs
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\obj\Debug\net8.0\Shopping_Core.csproj.CoreCompileInputs.cache
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\obj\Debug\net8.0\Shopping.B5BF5313.Up2Date
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\obj\Debug\net8.0\Shopping_Core.dll
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\obj\Debug\net8.0\refint\Shopping_Core.dll
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\obj\Debug\net8.0\Shopping_Core.pdb
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\obj\Debug\net8.0\Shopping_Core.genruntimeconfig.cache
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Core\obj\Debug\net8.0\ref\Shopping_Core.dll
