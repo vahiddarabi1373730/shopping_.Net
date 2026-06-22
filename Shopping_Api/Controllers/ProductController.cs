@@ -26,8 +26,8 @@ public class ProductController(IProductService productService) : BaseController
         return JsonResponse.Success(count);
     }
 
-    [HttpGet("products/{id}")]
-    public async Task<IActionResult> GetProducts(long id)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetProductById(long id)
     {
         var product = await _productService.GetProductById(id);
         if (product is null)
@@ -61,10 +61,20 @@ public class ProductController(IProductService productService) : BaseController
         return JsonResponse.Error("خطا در عملیات.");
     }
     
-    [HttpPut("update-product/{productId}")]
-    public async Task<IActionResult> UpdateProduct([FromForm] CrudProductDto crudProductDto,long productId)
+    [HttpPut("{productId}")]
+    public async Task<IActionResult> Edit([FromForm] CrudProductDto crudProductDto,long productId)
     {
         var isSuccess =await _productService.UpdateProduct(crudProductDto,productId);
+        if (isSuccess)
+        {
+            return JsonResponse.Success("عملیات با موفقیت انجام شد.");
+        }
+        return JsonResponse.Error("خطا در عملیات.");
+    }
+    [HttpDelete("{productId}")]
+    public async Task<IActionResult> DeleteProduct(long productId)
+    {
+        var isSuccess =await _productService.DeleteProduct(productId);
         if (isSuccess)
         {
             return JsonResponse.Success("عملیات با موفقیت انجام شد.");

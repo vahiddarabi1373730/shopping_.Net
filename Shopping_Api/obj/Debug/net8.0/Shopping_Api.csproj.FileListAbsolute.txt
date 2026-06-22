@@ -171,3 +171,4 @@ D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Api\bin\Debug\net8.0\Microsoft.
 D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Api\obj\Debug\net8.0\Shopping_Api.RazorAssemblyInfo.cache
 D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Api\obj\Debug\net8.0\Shopping_Api.RazorAssemblyInfo.cs
 D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Api\bin\Debug\net8.0\Shopping_Api.staticwebassets.runtime.json
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Api\obj\Debug\net8.0\Shopping_Api.sourcelink.json

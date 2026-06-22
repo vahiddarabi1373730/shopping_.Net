@@ -29,8 +29,9 @@ public class GenericRepository<TEntity>(ShoppingContext context):IGenericReposit
         await context.AddAsync(entity);
     }
 
-    public void UpdateEntity(TEntity entity)
+    public void UpdateEntity(TEntity entity,bool setFromUpdateDate=false)
     {
+        entity.CreateDate = setFromUpdateDate ? entity.CreateDate:DateTime.Now;
         entity.LastUpdateDate = DateTime.Now;
         context.Update(entity);
     }

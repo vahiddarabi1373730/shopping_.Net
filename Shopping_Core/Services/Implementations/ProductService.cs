@@ -48,7 +48,7 @@ public class ProductService(
             product.ImageName = await _saveImageService.SaveImage(crudProductDto.ImageFile);
         }
 
-        await _genericRepository.AddEntity(product);
+        await _genericRepository.AddEntity(product,true);
         return await _genericRepository.SaveChangesAsync();
     }
 
@@ -99,10 +99,27 @@ public class ProductService(
         return await _genericRepository.GetEntitiesQuery().AnyAsync(c => c.Id == productId);
     }
 
-    public async Task<Product> GetProductById(long id)
+    public async Task<ProductResponse> GetProductById(long id)
     {
-        var product = await _genericRepository.GetEntityById(id);
-        return product;
+        var product = await _genericRepository.GetEntitiesQuery()
+            .Include(p=>p.ProductGalleries).SingleAsync(p=>p.Id==id);
+        var res = new ProductResponse
+        {
+            Id = product.Id,
+            Price = product.Price,
+            Description = product.Description,
+            ImageName = product.ImageName,
+            ProductName = product.ProductName,
+            IsExists = product.IsExists,
+            IsSpecial = product.IsSpecial,
+            ShortDescription = product.ShortDescription,
+            CreateDate = product.CreateDate,
+            Images =product.ProductGalleries.Count!=0 ? product.ProductGalleries.Select(pg=>new  GalleryImageResponse
+            {
+                ImageName = pg.ImageName,ProductId = pg.ProductId
+            }) .ToList():[]
+        };
+        return res;
     }
 
     public async Task<FilterProductsDto> FilterProducts(FilterProductsDto filterProductsDto)
@@ -118,6 +135,7 @@ public class ProductService(
     {
         var productQuery = _genericRepository
             .GetEntitiesQuery()
+            .Where(p=>p.IsDelete!=true)
             .Include(p => p.ProductGalleries)
             .OrderByDescending(p=>p.CreateDate)
             .AsQueryable();
@@ -179,12 +197,20 @@ public class ProductService(
         product.Description = crudProductDto.Description;
         product.Price=crudProductDto.Price;
         product.IsExists=crudProductDto.IsExists;
+        product.CreateDate = DateTime.Parse(crudProductDto.CreateDate);
+
         if (crudProductDto.ImageFile is not null)
         {
-            product.ImageName =  $"{CurrentDomain.GetDomain()}{await _saveImageService.SaveImage(crudProductDto.ImageFile)}" ;
+            product.ImageName = await _saveImageService.SaveImage(crudProductDto.ImageFile);
         }
-        _genericRepository.UpdateEntity(product);
+        _genericRepository.UpdateEntity(product,true);
         return await _genericRepository.SaveChangesAsync();
 
+    }
+
+    public async Task<bool> DeleteProduct(long productId)
+    {
+        await _genericRepository.DeleteEntity(productId);
+        return await _genericRepository.SaveChangesAsync();
     }
 }

@@ -7,6 +7,7 @@ namespace Shopping_Core.Services.Interfaces;
 public interface IUserService:IDisposable
 {
     public Task<List<UserResponse>> GetAllUsers();
+    public Task<int> GetCount();
     public Task<bool> AddUser(UserRequest request);
     public Task<bool> Edit(UserRequest request,long id);
     public Task<RegisterResponse> RegisterUser(User user);

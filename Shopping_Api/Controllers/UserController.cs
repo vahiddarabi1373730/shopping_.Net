@@ -17,6 +17,11 @@ public class UserController(IUserService userService):BaseController
     {
         return JsonResponse.Success(await UserService.GetAllUsers());
     }
+    [HttpGet("count")]
+    public async Task<IActionResult> GetAllCount()
+    {
+        return JsonResponse.Success(await UserService.GetCount());
+    }
     [HttpPost]
     public async Task<IActionResult> Add(UserRequest request)
     {

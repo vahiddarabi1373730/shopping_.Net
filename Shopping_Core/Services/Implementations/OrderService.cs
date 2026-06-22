@@ -39,8 +39,9 @@ public class OrderService(
         return order;
     }
 
-    public async Task<List<OrderResponse>> GetOrders(long userId)
+    public async Task<List<OrderResponse>> GetUserOrders(long userId)
     {
+        var user = await UserService.GetUserById(userId);
         return await GenericRepository.GetEntitiesQuery()
             .Where(o => o.UserId == userId && !o.IsDelete)
             .Include(o => o.OrderItems)
@@ -48,17 +49,59 @@ public class OrderService(
             .Select(o => new OrderResponse()
             {
                 IsPay = o.IsPay,
-                UserId = o.UserId,
+                FullName = user.FirstName + " " + user.LastName,
                 OrderItemResponse = o.OrderItems.Where(oi=>!oi.IsDelete).Select(oi => new OrderItemResponse()
                 {
+                    Id = oi.Id,
                     Count = oi.Count,
                     ImageName = oi.Product.ImageName,
                     Price = oi.Product.Price,
                     ProductName = oi.Product.ProductName,
+                    ProductId = oi.ProductId
                 }).ToList(),
                 PaymentDate = o.PaymentDate,
                 CreateDate = o.CreateDate,
             }).ToListAsync();
+    }
+
+    public async Task<List<OrderResponse>> GetOrders(long userId)
+    {
+        var user = await UserService.GetUserById(userId);
+        return await GenericRepository.GetEntitiesQuery()
+            .Include(o=>o.OrderItems)
+            .ThenInclude(oi=>oi.Product)
+            .Select(order=>new OrderResponse
+        {
+            Id = order.Id,
+            CreateDate = order.CreateDate,
+            IsPay = order.IsPay,
+            PaymentDate = order.PaymentDate,
+            FullName = user.FirstName + " " + user.LastName,
+            OrderItemResponse = order.OrderItems.Select(oi=>new OrderItemResponse()
+            {
+                Id = oi.Id,
+                Count = oi.Count,
+                ImageName = oi.Product.ImageName,
+                Price = oi.Price,
+                ProductName = oi.Product.ProductName,
+                ProductId = oi.ProductId
+            }).ToList()
+        }).ToListAsync();
+    }
+
+    public async Task<List<OrderItemResponse>> GetOrderItemsByOrderId(long orderId)
+    {
+        return await OrderItemService.GetOrderItemsResponse(orderId);
+    }
+
+    public async Task<int> GetOrderItemsCountByOrderId(long orderId)
+    {
+        return await OrderItemService.GetOrderItemsResponseCount(orderId);
+    }
+
+    public async Task<int> GetOrdersCount()
+    {
+        return await GenericRepository.GetEntitiesQuery().CountAsync();
     }
 
     public async Task<Order> GetOpenOrder(long userId)
@@ -78,18 +121,21 @@ public class OrderService(
         {
             OrderItemResponses = order.OrderItems.Select(orderItem => new OrderItemResponse()
             {
+                Id = orderItem.Id,
                 Count = orderItem.Count,
                 ImageName = $"{CurrentDomain.GetDomain()}{orderItem.Product.ImageName}",
                 ProductName = orderItem.Product.ProductName,
                 Price = orderItem.Product.Price,
+                ProductId = orderItem.ProductId
             }).ToList(),
             SendPay = 4500,
             SumOrderItemsPrice = order.OrderItems.Sum(oi => oi.Price)
         };
     }
 
-    public async Task<OrderResponse> RemoveOrderItem(long orderId, long orderItemId)
+    public async Task<OrderResponse> RemoveOrderItem(long orderId, long orderItemId,long userId)
     {
+        var user = await UserService.GetUserById(userId);
         var order = await GenericRepository.GetEntitiesQuery().Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
             .SingleOrDefaultAsync(o => o.Id == orderId);
         if (order is null) return null;
@@ -100,13 +146,15 @@ public class OrderService(
         return new OrderResponse()
         {
             IsPay = order.IsPay,
-            UserId = order.UserId,
+            FullName = user.FirstName + " " + user.LastName,
             OrderItemResponse = order.OrderItems.Where(oi=>!oi.IsDelete).Select(oi => new OrderItemResponse()
             {
+                Id = oi.Id,
                 Count = oi.Count,
                 ImageName = oi.Product.ImageName,
                 Price = oi.Product.Price,
                 ProductName = oi.Product.ProductName,
+                ProductId = oi.ProductId
             }).ToList(),
             PaymentDate = order.PaymentDate,
             CreateDate = order.CreateDate,

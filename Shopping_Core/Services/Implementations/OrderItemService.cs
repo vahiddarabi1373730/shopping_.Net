@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Shopping_Core.Models.Order;
+using Shopping_Core.Models.OrderItem;
 using Shopping_Core.Services.Interfaces;
 using Shopping_Data_Layer.Entities.Order;
 using Shopping_Data_Layer.Repository;
@@ -17,7 +17,29 @@ public class OrderItemService(IGenericRepository<OrderItem> genericRepository):I
         await _genericRepository.SaveChangesAsync();
     }
 
-    
+    public async Task<List<OrderItemResponse>> GetOrderItemsResponse(long orderId)
+    {
+        return await _genericRepository.GetEntitiesQuery()
+            .Where(oi => oi.OrderId == orderId && oi.IsDelete==false)
+            .Select(oi=>new OrderItemResponse
+            {
+                Id = oi.Id,
+                Count = oi.Count,
+                ImageName = oi.Product.ImageName,
+                Price = oi.Product.Price,
+                ProductName = oi.Product.ProductName,
+                ProductId = oi.Product.Id
+            })
+            .ToListAsync();
+    }
+
+    public async Task<int> GetOrderItemsResponseCount(long orderId)
+    {
+        return await _genericRepository.GetEntitiesQuery()
+            .Where(oi => oi.OrderId == orderId).CountAsync();
+    }
+
+
     public async Task<bool> RemoveOrderItem(long orderItemId)
     {
         await _genericRepository.DeleteEntity(orderItemId);

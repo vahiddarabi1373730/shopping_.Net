@@ -48,6 +48,11 @@ public class UserService(
         }).ToListAsync();
     }
 
+    public async Task<int> GetCount()
+    {
+        return await _genericRepository.GetEntitiesQuery().CountAsync();
+    }
+
     public async Task<bool> AddUser(UserRequest request)
     {
         var user= new User

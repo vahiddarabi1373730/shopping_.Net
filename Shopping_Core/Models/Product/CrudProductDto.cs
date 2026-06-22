@@ -18,8 +18,7 @@ public class CrudProductDto:BaseDto
     [MaxLength(100,ErrorMessage = "تعداد کاراکتر های {0} نمیتواند بیشتر از {1} باشد")]
     public string Description { get; set; }
     
-    [Required(ErrorMessage = "لطفا تصویر را وارد کنید.")]
-    public IFormFile ImageFile { get; set; }
+    public IFormFile? ImageFile { get; set; }
     
     [Required(ErrorMessage = "لطفا قیمت را وارد کنید.")]
     [Range(0,100000,ErrorMessage = "تعداد کاراکتر های {0} نمیتواند بیشتر از {1} باشد")]

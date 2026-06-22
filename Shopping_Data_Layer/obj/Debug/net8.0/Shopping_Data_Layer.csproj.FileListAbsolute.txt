@@ -12,3 +12,4 @@ D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Data_Layer\obj\Debug\net8.0\ref
 D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Data_Layer\obj\Debug\net8.0\Shopping_Data_Layer.pdb
 D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Data_Layer\obj\Debug\net8.0\Shopping_Data_Layer.genruntimeconfig.cache
 D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Data_Layer\obj\Debug\net8.0\ref\Shopping_Data_Layer.dll
+D:\projects\Angular_Dotnet_Shop\BackEnd\Shopping_Data_Layer\obj\Debug\net8.0\Shopping_Data_Layer.sourcelink.json
