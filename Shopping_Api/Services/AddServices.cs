@@ -34,6 +34,7 @@ public static class AddServices
         services.AddScoped<IDepositService, DepositService>();
         services.AddScoped<IWithdrawService, WithdrawService>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<ILinqService, LinqService>();
     }
 
     public static void AddAppSettingsShopping(this IServiceCollection services)

@@ -1,8 +1,10 @@
+using System.Text;
 using Shopping_Api.Hubs;
 using Shopping_Api.Services;
 using Shopping_Core.Utilities.Common;
 using Shopping_Core.Utilities.Extensions;
 
+Console.OutputEncoding = Encoding.UTF8;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
