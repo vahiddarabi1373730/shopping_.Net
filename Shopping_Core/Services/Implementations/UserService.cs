@@ -11,6 +11,7 @@ using Shopping_Core.Security;
 using Shopping_Core.Services.Interfaces;
 using Shopping_Core.Utilities.Convertors;
 using Shopping_Core.Utilities.Extensions;
+using Shopping_Data_Layer.Entities.Access;
 using Shopping_Data_Layer.Entities.Account;
 using Shopping_Data_Layer.Repository;
 
@@ -45,6 +46,8 @@ public class UserService(
             FirstName = user.FirstName,
             LastName = user.LastName,
             Id = user.Id,
+            Balance = user.Balance
+            
         }).ToListAsync();
     }
 
@@ -75,11 +78,21 @@ public class UserService(
         user.Email = request.Email;
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
-        
-        
-        
         _genericRepository.UpdateEntity(user);
         return await _genericRepository.SaveChangesAsync();
+    }
+
+    public async Task<bool> UpdateBalance(decimal amount, long id)
+    {
+        var user =await _genericRepository.GetEntityById(id);
+        user.Balance = amount + user.Balance;
+        _genericRepository.UpdateEntity(user);
+        return await _genericRepository.SaveChangesAsync();
+    }
+
+    public Task<bool> SaveChanges()
+    {
+        return _genericRepository.SaveChangesAsync();
     }
 
     public async Task<RegisterResponse> RegisterUser(User userbody)
@@ -152,6 +165,27 @@ public class UserService(
         };
         var token = GenerateToken(email, user.Id);
         return new LoginResponse(LoginStatus.IsSuccess,token,userWithRoleResponse);
+    }
+
+    public async Task<CurrentResponse> CurrentUser(long userId)
+    {
+        var user =await _genericRepository.GetEntitiesQuery()
+            .Include(u=>u.UserRoles)
+            .ThenInclude(ur=>ur.Role)
+            .SingleOrDefaultAsync(u=>u.Id==userId);
+        var token = GenerateToken(user.Email, userId);
+        var current = new CurrentResponse(token, new UserWithRoleResponse
+        {
+            Email = user.Email,
+            FullName = $"{user.FirstName}-{user.LastName}",
+            Address = user.Address,
+            UserRoleResponse = user.UserRoles.Select(r => new UserRoleResponse
+            {
+                Name = r.Role.Name,
+                Title = r.Role.Title
+            }).ToList()
+        },DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeSeconds(),user.Balance);
+        return current;
     }
 
     private string GenerateToken(string email,long id)

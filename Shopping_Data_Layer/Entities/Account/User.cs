@@ -35,6 +35,11 @@ public class User:BaseEntity
     [MaxLength(100,ErrorMessage = "تعداد کاراکتر های {0} نمیتواند بیشتر از {1} باشد")]
     public string Address { get; set; }
     
+    [DisplayName("موجودی")]
+    [Required(ErrorMessage = "لطفا {0} را وارد کنید.")]
+    [Range(1,100000000,ErrorMessage = "تعداد کاراکتر های {0} نمیتواند بیشتر از {1} باشد")]
+    public decimal Balance { get; set; }
+    
     [MaxLength(100,ErrorMessage = "تعداد کاراکتر های {0} نمیتواند بیشتر از {1} باشد")]
     public string EmailActiveCode { get; set; }
     
@@ -48,6 +53,7 @@ public class User:BaseEntity
     public ICollection<UserRole> UserRoles { get; set; }
     public ICollection<ProductComment> ProductComments { get; set; }
     public ICollection<Order.Order> Orders { get; set; }
+    public ICollection<Deposit> Deposits { get; set; }
     
     #endregion
 }

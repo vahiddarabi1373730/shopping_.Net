@@ -173,4 +173,20 @@ public class AccountController(IUserService userService) : BaseController
     }
 
     #endregion
+
+    #region  Current
+
+    [HttpGet]
+    public async Task<IActionResult> Current()
+    {
+        if (User.Identity is not null && User.Identity.IsAuthenticated)
+        {
+            var userId =  User.CheckAuthUser();
+            var currentResponse = await _userService.CurrentUser(userId);
+            return JsonResponse.Success(currentResponse);
+        }
+        return JsonResponse.UnAuthorized("ابتدا وارد شوید.");
+    }
+
+    #endregion
 }

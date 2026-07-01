@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Shopping_Core.Models.Notifications;
 using Shopping_Core.Security;
 using Shopping_Core.Services.Implementations;
 using Shopping_Core.Services.Interfaces;
@@ -30,6 +31,9 @@ public static class AddServices
         services.AddScoped<IUserRoleService, UserRoleService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IAccessService, AccessService>();
+        services.AddScoped<IDepositService, DepositService>();
+        services.AddScoped<IWithdrawService, WithdrawService>();
+        services.AddScoped<INotificationService, NotificationService>();
     }
 
     public static void AddAppSettingsShopping(this IServiceCollection services)
@@ -49,16 +53,36 @@ public static class AddServices
                         .AllowAnyMethod()
                         .AllowCredentials()
                         .WithOrigins("http://localhost:3000")
-                        .WithOrigins("http://localhost:4000")
+                        .WithOrigins("http://localhost:4200")
                         .Build();
                 });
         });
+    }
+
+    public static IServiceCollection AddSignalRService(this IServiceCollection services)
+    {
+        services.AddSignalR();
+        return services;
     }
 
     public static void AddJwtAuthentication(this IServiceCollection services)
     {
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
         {
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken=context.HttpContext.Request.Query["access_token"];
+                    var path=context.HttpContext.Request.Path;
+                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notifications"))
+                    {
+                        context.Token = accessToken;
+                    }
+                    return Task.CompletedTask;
+
+                }
+            };
             options.TokenValidationParameters = new TokenValidationParameters()
             {
                 ValidateIssuer = true,

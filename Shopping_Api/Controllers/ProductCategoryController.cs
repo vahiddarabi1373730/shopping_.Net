@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shopping_Core.Dtos.ProductCategory;
+using Shopping_Core.Models.ProductCategory;
 using Shopping_Core.Services.Interfaces;
 using Shopping_Core.Utilities.Common;
 
@@ -8,10 +9,16 @@ namespace Shopping_Api.Controllers;
 public class ProductCategoryController(IProductCategoryService productCategoryService):BaseController
 {
     [HttpGet]
-    public async Task<IActionResult> GetAllProductCategory()
+    public async Task<IActionResult> GetAllProductCategory([FromQuery]ProductCategoryRequest request)
     {
-        var productCategories = await productCategoryService.ProductCategories();
+        var productCategories = await productCategoryService.ProductCategories(request);
         return JsonResponse.Success(productCategories);
+    }
+    [HttpGet("count")]
+    public async Task<IActionResult> GetAllProductCategoryCount()
+    {
+        var count = await productCategoryService.ProductCategoriesCount();
+        return JsonResponse.Success(count);
     }
     
     [HttpGet("products/{id}")]

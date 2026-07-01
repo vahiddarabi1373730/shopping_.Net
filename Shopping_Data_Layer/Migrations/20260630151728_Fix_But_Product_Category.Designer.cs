@@ -12,8 +12,8 @@ using Shopping_Data_Layer.Context;
 namespace Shopping_Data_Layer.Migrations
 {
     [DbContext(typeof(ShoppingContext))]
-    [Migration("20260530100225_Initial")]
-    partial class Initial
+    [Migration("20260630151728_Fix_But_Product_Category")]
+    partial class Fix_But_Product_Category
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,6 +89,40 @@ namespace Shopping_Data_Layer.Migrations
                     b.ToTable("UserRoles");
                 });
 
+            modelBuilder.Entity("Shopping_Data_Layer.Entities.Account.Deposit", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastUpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Deposits");
+                });
+
             modelBuilder.Entity("Shopping_Data_Layer.Entities.Account.User", b =>
                 {
                     b.Property<long>("Id")
@@ -101,6 +135,9 @@ namespace Shopping_Data_Layer.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
@@ -141,6 +178,40 @@ namespace Shopping_Data_Layer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Shopping_Data_Layer.Entities.Account.Withdraw", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastUpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Withdraws");
                 });
 
             modelBuilder.Entity("Shopping_Data_Layer.Entities.Order.Order", b =>
@@ -496,6 +567,28 @@ namespace Shopping_Data_Layer.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Shopping_Data_Layer.Entities.Account.Deposit", b =>
+                {
+                    b.HasOne("Shopping_Data_Layer.Entities.Account.User", "User")
+                        .WithMany("Deposits")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Shopping_Data_Layer.Entities.Account.Withdraw", b =>
+                {
+                    b.HasOne("Shopping_Data_Layer.Entities.Account.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Shopping_Data_Layer.Entities.Order.Order", b =>
                 {
                     b.HasOne("Shopping_Data_Layer.Entities.Account.User", "User")
@@ -528,7 +621,7 @@ namespace Shopping_Data_Layer.Migrations
 
             modelBuilder.Entity("Shopping_Data_Layer.Entities.Product.ProductCategory", b =>
                 {
-                    b.HasOne("Shopping_Data_Layer.Entities.Product.ProductGallery", "ParentCategory")
+                    b.HasOne("Shopping_Data_Layer.Entities.Product.ProductCategory", "ParentCategory")
                         .WithMany()
                         .HasForeignKey("ParentId");
 
@@ -602,6 +695,8 @@ namespace Shopping_Data_Layer.Migrations
 
             modelBuilder.Entity("Shopping_Data_Layer.Entities.Account.User", b =>
                 {
+                    b.Navigation("Deposits");
+
                     b.Navigation("Orders");
 
                     b.Navigation("ProductComments");

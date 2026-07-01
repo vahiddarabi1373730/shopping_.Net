@@ -68,6 +68,7 @@ public class OrderService(
     {
         var user = await UserService.GetUserById(userId);
         return await GenericRepository.GetEntitiesQuery()
+            .Where(o=>!o.IsDelete)
             .Include(o=>o.OrderItems)
             .ThenInclude(oi=>oi.Product)
             .Select(order=>new OrderResponse
@@ -77,7 +78,7 @@ public class OrderService(
             IsPay = order.IsPay,
             PaymentDate = order.PaymentDate,
             FullName = user.FirstName + " " + user.LastName,
-            OrderItemResponse = order.OrderItems.Select(oi=>new OrderItemResponse()
+            OrderItemResponse = order.OrderItems.Where(oi=>!oi.IsDelete).Select(oi=>new OrderItemResponse()
             {
                 Id = oi.Id,
                 Count = oi.Count,
@@ -119,18 +120,49 @@ public class OrderService(
             .SingleOrDefaultAsync(o => o.Id == orderId);
         return new BasketResponse
         {
-            OrderItemResponses = order.OrderItems.Select(orderItem => new OrderItemResponse()
+            OrderItemResponses = order.OrderItems.Where(oi=>!oi.IsDelete).Select(orderItem => new OrderItemResponse()
             {
                 Id = orderItem.Id,
                 Count = orderItem.Count,
-                ImageName = $"{CurrentDomain.GetDomain()}{orderItem.Product.ImageName}",
+                ImageName = orderItem.Product.ImageName,
                 ProductName = orderItem.Product.ProductName,
                 Price = orderItem.Product.Price,
                 ProductId = orderItem.ProductId
             }).ToList(),
+            OrderId = order.Id,
             SendPay = 4500,
-            SumOrderItemsPrice = order.OrderItems.Sum(oi => oi.Price)
+            SumOrderItemsPrice = order.OrderItems.Sum(oi => oi.Price * oi.Count)
         };
+    }
+
+    public async Task<bool> PayBasket(long orderId,long userId)
+    {
+        var order = await GenericRepository.GetEntitiesQuery()
+            .Include(o=>o.OrderItems)
+            .ThenInclude(oi=>oi.Product)
+            .Where(o => o.Id == orderId)
+            .SingleOrDefaultAsync();
+        var user = await UserService.GetUserById(userId);
+        if (order is null)
+        {
+            throw new Exception("سفارش مورد نظر پیدا نشد");
+        }
+        if (user is null)
+        {
+            throw new Exception("کاربر مورد نظر پیدا نشد");
+        }
+
+        var sumOrderItemsPrice = order.OrderItems.Sum(oi => oi.Price * oi.Count);
+
+        if (sumOrderItemsPrice + 4500 > user.Balance)
+        {
+            throw new Exception("موجودی ندارید");
+        }
+        
+        await userService.UpdateBalance(-(sumOrderItemsPrice + 4500), userId);
+        order.IsPay = true;
+        GenericRepository.UpdateEntity(order);
+        return await GenericRepository.SaveChangesAsync();
     }
 
     public async Task<OrderResponse> RemoveOrderItem(long orderId, long orderItemId,long userId)
@@ -161,18 +193,15 @@ public class OrderService(
         };
     }
 
-    public async Task AddProductToOrder(long userId, long productId, int count)
+    public async Task<long> AddProductToOrder(long userId, long productId, int count)
     {
         var user = await UserService.GetUserById(userId);
         var product = await ProductService.GetProductById(productId);
+        var openOrder = new Order();
         if (product is not null && user is not null)
         {
-            if (count <= 1)
-            {
-                count = 1;
-            }
 
-            var openOrder = await GetOpenOrder(userId);
+            openOrder = await GetOpenOrder(userId);
             var orderItems = await OrderItemService.GetOrderItems(openOrder.Id);
             var isExistProduct = orderItems.SingleOrDefault(oi => oi.ProductId == productId);
             if (isExistProduct is not null)
@@ -187,10 +216,13 @@ public class OrderService(
                     Count = count,
                     OrderId = openOrder.Id,
                     Price = product.Price,
-                    ProductId = productId
+                    ProductId = productId,
+                    IsDelete = false
                 };
                 await OrderItemService.AddOrderItem(orderItem);
             }
         }
+
+        return openOrder.Id;
     }
 }

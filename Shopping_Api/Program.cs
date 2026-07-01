@@ -1,3 +1,4 @@
+using Shopping_Api.Hubs;
 using Shopping_Api.Services;
 using Shopping_Core.Utilities.Common;
 using Shopping_Core.Utilities.Extensions;
@@ -15,6 +16,8 @@ builder.Services.AddJwtAuthentication();
 builder.Services.AddAppSettingsShopping();
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSignalRService();
+
 
 var app = builder.Build();
 
@@ -34,4 +37,5 @@ app.UseCors("EnableShoppingCors");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notifications");
 app.Run();

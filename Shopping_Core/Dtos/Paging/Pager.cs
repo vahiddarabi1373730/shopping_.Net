@@ -2,8 +2,9 @@
 
 public class Pager
 {
-    public static BasePaging Build(int pageCount, int takeEntity, int activePage)
+    public static BasePaging BuildBasePaging<T>(IQueryable<T> query,int takeEntity, int activePage)
     {
+        var pageCount = (int)Math.Ceiling(query.Count() / (decimal)takeEntity);
         return new BasePaging
         {
             PageId = activePage,

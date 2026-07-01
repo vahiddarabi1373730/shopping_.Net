@@ -14,7 +14,8 @@ public interface IOrderService
     Task<int> GetOrdersCount();
     Task<Order> GetOpenOrder(long userId);
     Task<BasketResponse> GetBasket(long orderId);
+    Task<bool> PayBasket(long orderId , long userId);
     Task<OrderResponse> RemoveOrderItem(long orderId,long orderItemId,long userId);
-    Task AddProductToOrder(long userId, long productId,int count);
+    Task<long> AddProductToOrder(long userId, long productId,int count);
 
 }

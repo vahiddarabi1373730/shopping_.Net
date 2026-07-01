@@ -28,7 +28,7 @@ public class ProductCategory:BaseEntity
     #region Relations
 
     [ForeignKey(nameof(ParentId))]
-    public ProductGallery ParentCategory { get; set; }
+    public ProductCategory ParentCategory { get; set; }
 
     public ICollection<ProductSelectedCategory> ProductSelectedCategories { get; set; }
 

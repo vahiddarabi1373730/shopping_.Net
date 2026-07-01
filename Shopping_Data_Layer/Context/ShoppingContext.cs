@@ -32,6 +32,8 @@ public class ShoppingContext : DbContext
     public DbSet<Slider> Sliders { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Deposit> Deposits { get; set; }
+    public DbSet<Withdraw> Withdraws { get; set; }
 
     #endregion
 

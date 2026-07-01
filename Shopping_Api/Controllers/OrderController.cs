@@ -14,9 +14,9 @@ public class OrderController(IOrderService orderService) : BaseController
         if (User.Identity is not null && User.Identity.IsAuthenticated)
         {
             var userId = User.CheckAuthUser();
-            await orderService.AddProductToOrder(userId, addProductToOrderRequest.ProductId,
+            var response=await orderService.AddProductToOrder(userId, addProductToOrderRequest.ProductId,
                 addProductToOrderRequest.Count);
-            return JsonResponse.Success("درخواست با موفقیت اجرا شد");
+            return JsonResponse.Success(response);
         }
 
         return JsonResponse.Error("درخواست با خطا روبه رو شد");
@@ -67,6 +67,20 @@ public class OrderController(IOrderService orderService) : BaseController
         return JsonResponse.Success(basketResponse);
     }
 
+    [HttpPost("{orderId}")]
+    public async Task<IActionResult> PayBasket(long orderId)
+    {
+        if (User.Identity is not null && User.Identity.IsAuthenticated)
+        {
+            var userId = User.CheckAuthUser();
+            await orderService.PayBasket(orderId, userId);
+            return JsonResponse.Success("درخواست با موفقیت اجرا شد");
+        }
+
+        return JsonResponse.Error("ابتدا وارد شوید");
+    }
+    
+    
     [HttpDelete("orders/{orderId}/items/{orderItemId}")]
     public async Task<IActionResult> GetBasket(long orderId, long orderItemId)
     {
@@ -78,5 +92,5 @@ public class OrderController(IOrderService orderService) : BaseController
         }
 
         return JsonResponse.Success(orderResponse);
-    }
+    } 
 }

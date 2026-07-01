@@ -4,7 +4,6 @@ using Shopping_Core.Dtos.Products;
 using Shopping_Core.Models.Product;
 using Shopping_Core.Models.ProductGallery;
 using Shopping_Core.Services.Interfaces;
-using Shopping_Core.Utilities.Common;
 using Shopping_Core.Utilities.Extensions;
 using Shopping_Data_Layer.Entities.Product;
 using Shopping_Data_Layer.Repository;
@@ -16,17 +15,17 @@ public class ProductService(
     ISaveImageService saveImageService,
     IGenericRepository<ProductSelectedCategory> genericRepositorySelectedCategory) : IProductService
 {
-    private IGenericRepository<Product> _genericRepository { get; } = genericRepository;
+    private IGenericRepository<Product> GenericRepository { get; } = genericRepository;
 
-    private IGenericRepository<ProductSelectedCategory> _genericRepositorySelectedCategory { get; } =
+    private IGenericRepository<ProductSelectedCategory> GenericRepositorySelectedCategory { get; } =
         genericRepositorySelectedCategory;
 
-    private ISaveImageService _saveImageService { get; } = saveImageService;
+    private ISaveImageService SaveImageService { get; } = saveImageService;
 
 
     public void Dispose()
     {
-        _genericRepository.Dispose();
+        GenericRepository.Dispose();
     }
 
     public async Task<bool> AddProducts(CrudProductDto crudProductDto)
@@ -45,20 +44,20 @@ public class ProductService(
 
         if (crudProductDto.ImageFile is not null)
         {
-            product.ImageName = await _saveImageService.SaveImage(crudProductDto.ImageFile);
+            product.ImageName = await SaveImageService.SaveImage(crudProductDto.ImageFile);
         }
 
-        await _genericRepository.AddEntity(product,true);
-        return await _genericRepository.SaveChangesAsync();
+        await GenericRepository.AddEntity(product,true);
+        return await GenericRepository.SaveChangesAsync();
     }
 
     public async Task<List<ProductResponse>> GetRelatedProducts(long productId)
     {
-        var product = await _genericRepository.GetEntityById(productId);
+        var product = await GenericRepository.GetEntityById(productId);
         if (product is null) return null;
         
         //برو لیست Id تمام دسته بندی هایی که این محصول در آن وجود دارند را بیار
-        var selectedCategoryIds = await _genericRepositorySelectedCategory.GetEntitiesQuery()
+        var selectedCategoryIds = await GenericRepositorySelectedCategory.GetEntitiesQuery()
             .Where(psc => psc.ProductId == productId)
             .Select(psc => psc.ProductCategoryId).ToListAsync();
         
@@ -69,7 +68,7 @@ public class ProductService(
         }
 
         //ابتدا ProductGalleries را بیار سپس چک کن که لیستی که میخواهی برگردانی شامل همین محصول نباشد سپس در لیست ProductSelectedCategories اگر هر رکوردی ProductCategoryId داخل selectedCategoryIds بود آن رکورد را برگردان و در نهایت 6 رکورد را به من بده
-        var relatedProduct = await _genericRepository.GetEntitiesQuery()
+        var relatedProduct = await GenericRepository.GetEntitiesQuery()
             .Include(p => p.ProductGalleries)
             .Where(pr =>
                 pr.Id != productId &&
@@ -96,12 +95,12 @@ public class ProductService(
 
     public async Task<bool> IsExistProduct(long productId)
     {
-        return await _genericRepository.GetEntitiesQuery().AnyAsync(c => c.Id == productId);
+        return await GenericRepository.GetEntitiesQuery().AnyAsync(c => c.Id == productId);
     }
 
     public async Task<ProductResponse> GetProductById(long id)
     {
-        var product = await _genericRepository.GetEntitiesQuery()
+        var product = await GenericRepository.GetEntitiesQuery()
             .Include(p=>p.ProductGalleries).SingleAsync(p=>p.Id==id);
         var res = new ProductResponse
         {
@@ -125,15 +124,15 @@ public class ProductService(
     public async Task<FilterProductsDto> FilterProducts(FilterProductsDto filterProductsDto)
     {
         var productQuery = FilterProductsQuery(filterProductsDto);
-        var count = (int)Math.Ceiling(productQuery.Count() / (decimal)filterProductsDto.TakeEntity);
-        var basePaging = Pager.Build(count, filterProductsDto.TakeEntity, filterProductsDto.ActivePage);
-        var products = await productQuery.Paging(basePaging).Include(p => p.ProductGalleries).ToListAsync();
+        
+        var basePaging = Pager.BuildBasePaging(productQuery, filterProductsDto.TakeEntity, filterProductsDto.ActivePage);
+        var products = await productQuery.Paging(basePaging).ToListAsync();
         return filterProductsDto.SetProducts(products).SetPaging(basePaging);
     }
     
-    public IQueryable<Product> FilterProductsQuery(FilterProductsDto filterProductsDto)
+    private IQueryable<Product> FilterProductsQuery(FilterProductsDto filterProductsDto)
     {
-        var productQuery = _genericRepository
+        var productQuery = GenericRepository
             .GetEntitiesQuery()
             .Where(p=>p.IsDelete!=true)
             .Include(p => p.ProductGalleries)
@@ -182,13 +181,13 @@ public class ProductService(
     public async Task<int> FilterProductsCount(FilterProductsDto filterProductsDto)
     {
         var productQuery = FilterProductsQuery(filterProductsDto);
-        return  productQuery.Count();
+        return await productQuery.CountAsync();
     }
 
 
     public async Task<bool> UpdateProduct(CrudProductDto crudProductDto,long productId)
     {
-        var product = await _genericRepository.GetEntityById(productId);
+        var product = await GenericRepository.GetEntityById(productId);
 
         if (product is null) return false;
         product.IsSpecial=crudProductDto.IsSpecial;
@@ -201,16 +200,16 @@ public class ProductService(
 
         if (crudProductDto.ImageFile is not null)
         {
-            product.ImageName = await _saveImageService.SaveImage(crudProductDto.ImageFile);
+            product.ImageName = await SaveImageService.SaveImage(crudProductDto.ImageFile);
         }
-        _genericRepository.UpdateEntity(product,true);
-        return await _genericRepository.SaveChangesAsync();
+        GenericRepository.UpdateEntity(product,true);
+        return await GenericRepository.SaveChangesAsync();
 
     }
 
     public async Task<bool> DeleteProduct(long productId)
     {
-        await _genericRepository.DeleteEntity(productId);
-        return await _genericRepository.SaveChangesAsync();
+        await GenericRepository.DeleteEntity(productId);
+        return await GenericRepository.SaveChangesAsync();
     }
 }

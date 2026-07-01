@@ -10,8 +10,11 @@ public interface IUserService:IDisposable
     public Task<int> GetCount();
     public Task<bool> AddUser(UserRequest request);
     public Task<bool> Edit(UserRequest request,long id);
+    public Task<bool> UpdateBalance(decimal amount,long id);
+    public Task<bool> SaveChanges();
     public Task<RegisterResponse> RegisterUser(User user);
     public Task<LoginResponse> LoginUser(string email,string password,bool checkAdmin=false);
+    public Task<CurrentResponse> CurrentUser(long userId);
     public Task<User> GetUserByEmailAndPassword(string email,string password);
     public Task<User> GetUserByEmail(string email);
     public Task<User> GetUserById(long id);
